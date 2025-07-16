@@ -8,7 +8,7 @@ public class MagicBullet : MagicBase
     {
         if (col.CompareTag("Enemy"))
         {
-            EnmyController enemy = col.GetComponent<EnemyContoroller>();
+            EnemyBase enemy = col.GetComponent<EnemyBase>();
 
             if (enemy != null)
             {

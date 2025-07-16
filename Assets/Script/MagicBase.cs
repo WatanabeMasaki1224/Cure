@@ -7,6 +7,7 @@ public abstract class MagicBase : MonoBehaviour
 {
     public float magicSpeed = 10f;
     public float lifeTime = 2f;
+    public int damage = 1;
     protected Vector2 direction;
     
     public virtual void SetDirection(Vector2 dir)
