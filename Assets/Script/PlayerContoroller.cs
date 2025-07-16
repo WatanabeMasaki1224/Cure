@@ -16,6 +16,8 @@ public class PlayerContoroller : MonoBehaviour
     private bool isGrounded;
     private float moveInput;
     private bool isFacingRight = true;
+    public GameObject magicBulletPrefub;
+    public Transform firePoint;
 
     // Start is called before the first frame update
     void Start()
@@ -45,7 +47,9 @@ public class PlayerContoroller : MonoBehaviour
         
         if(Input.GetKeyDown(KeyCode.Z))
         {
-
+            GameObject bullet = Instantiate(magicBulletPrefub,firePoint.position,Quaternion.identity);
+            Vector2 dir = isFacingRight ? Vector2.right : Vector2.left;
+            bullet.GetComponent<MagicBullet>().SetDirection(dir);
         }
     }
 
