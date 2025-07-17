@@ -7,6 +7,8 @@ public abstract class EnemyBase : MonoBehaviour
     [Header("ステータス")]
     public int maxHp = 3;
     protected int currentHP;
+    public int damageToPlayer = 1;
+    public int damageToRepair = 1;
     [Header("移動")]
     public float moveSpeed = 1f;
 

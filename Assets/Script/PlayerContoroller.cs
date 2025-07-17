@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Tilemaps;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UIElements;  // UI表示用
 
 public class PlayerContoroller : MonoBehaviour
 {
@@ -9,20 +11,28 @@ public class PlayerContoroller : MonoBehaviour
     public float _jumpPower = 1;
     public int _maxJumpCount = 1;
     private int _jumpCount = 0;
+    public int maxHP = 10;
+    private int currentHP;
     public Transform groundCheck;
     public float groundRadius = 0.2f;
     public LayerMask groundLayer;
     private Rigidbody2D rb;
+    private Collider2D col;
     private bool isGrounded;
     private float moveInput;
     private bool isFacingRight = true;
     public GameObject magicBulletPrefub;
     public Transform firePoint;
+    public Transform respawnPoint;
+    public float respownTime;
+    private bool isDead = false;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
+        currentHP = maxHP;
     }
 
     // Update is called once per frame
@@ -69,5 +79,62 @@ public class PlayerContoroller : MonoBehaviour
         Vector3 scare = transform.localScale;
         scare.x *= -1;
         transform.localScale = scare;
+    }
+
+    //プレイヤーのダメージ処理  
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            EnemyBase enemy = collision.gameObject.GetComponent<EnemyBase>();
+            if (enemy != null)
+            {
+                TakeDmage(enemy.damageToPlayer);
+            }
+        }
+    }
+
+    public void TakeDmage (int damage)
+    {
+        currentHP -= damage;
+        Debug.Log(currentHP);
+
+        if (isDead)
+        {
+            return;
+        }
+       
+
+        if (currentHP <= 0)
+        {
+            Die();
+        }
+    }
+
+   void Die()
+    {
+        isDead = true;
+        //動きを止める
+        rb.velocity = Vector2.zero;
+        rb.isKinematic = false;
+        col.enabled = false;
+
+        StartCoroutine(RespawnCoroutine());
+    }
+     
+    IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(respownTime);
+        Respown();
+    }
+
+    void Respown()
+    {
+        transform.position = respawnPoint.position;
+        currentHP = maxHP;
+        //挙動復活
+        rb.isKinematic = false ;
+        col.enabled = true ;
+        isDead = false ;
     }
 }
