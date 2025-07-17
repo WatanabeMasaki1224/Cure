@@ -202,7 +202,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -258,6 +258,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 3
+  damageToPlayer: 1
+  damageToRepair: 1
   moveSpeed: 1
 --- !u!212 &422401772
 SpriteRenderer:
@@ -721,6 +723,7 @@ MonoBehaviour:
   _moveSpeed: 5
   _jumpPower: 8
   _maxJumpCount: 1
+  maxHP: 3
   groundCheck: {fileID: 130895941}
   groundRadius: 0.2
   groundLayer:
@@ -728,6 +731,8 @@ MonoBehaviour:
     m_Bits: 8
   magicBulletPrefub: {fileID: 4726780099353223802, guid: 6ffe2801063a5cd43bd682882203049d, type: 3}
   firePoint: {fileID: 2037632002}
+  respawnPoint: {fileID: 1844236435}
+  respownTime: 2
 --- !u!1 &1604804557
 GameObject:
   m_ObjectHideFlags: 0
@@ -858,6 +863,37 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &1844236434
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1844236435}
+  m_Layer: 0
+  m_Name: RespawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1844236435
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844236434}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.59, y: -2.62, z: -0.051131714}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2037632001
 GameObject:
   m_ObjectHideFlags: 0
@@ -898,3 +934,4 @@ SceneRoots:
   - {fileID: 1296417577}
   - {fileID: 1604804559}
   - {fileID: 422401773}
+  - {fileID: 1844236435}
