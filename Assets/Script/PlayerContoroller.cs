@@ -22,10 +22,13 @@ public class PlayerContoroller : MonoBehaviour
     private float moveInput;
     private bool isFacingRight = true;
     public GameObject magicBulletPrefub;
+    public GameObject rebirthMagicPrefab;    // 再生魔法のプレハブ
+    public Transform magicSpawnPoint;        // 再生魔法を出す位置
     public Transform firePoint;
     public Transform respawnPoint;
     public float respownTime;
     private bool isDead = false;
+    private RebirthMagic rebirthMagic;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +36,7 @@ public class PlayerContoroller : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         currentHP = maxHP;
+        rebirthMagic = GetComponent<RebirthMagic>();
     }
 
     // Update is called once per frame
@@ -55,11 +59,22 @@ public class PlayerContoroller : MonoBehaviour
             Flip();
         }
         
+        //通常魔法
         if(Input.GetKeyDown(KeyCode.Z))
         {
             GameObject bullet = Instantiate(magicBulletPrefub,firePoint.position,Quaternion.identity);
             Vector2 dir = isFacingRight ? Vector2.right : Vector2.left;
             bullet.GetComponent<MagicBullet>().SetDirection(dir);
+        }
+        
+        //再生魔法
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            rebirthMagic?.StartHealing();
+        }
+        else if (Input.GetKeyUp(KeyCode.V))
+        {
+            rebirthMagic?.StopHealing();
         }
     }
 

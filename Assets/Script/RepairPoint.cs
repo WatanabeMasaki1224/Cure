@@ -40,6 +40,11 @@ public class RepairPoint : MonoBehaviour
         }
     }
 
+    public bool IsFullyRepaired() 
+    {
+        return isFullyRepaired;
+    }
+
     private void CheakRepairAtateChanged()
     {
         bool wasFullyRepaired = isFullyRepaired;

@@ -11,6 +11,8 @@ public abstract class EnemyBase : MonoBehaviour
     public int damageToRepair = 1;
     [Header("ˆÚ“®")]
     public float moveSpeed = 1f;
+    [Header("ƒXƒRƒA")]
+    public int scoreValue = 10;  // ‚±‚Ì“G‚ð“|‚µ‚½‚Æ‚«‚Ì“¾
 
     protected virtual void Start()
     {
@@ -31,6 +33,11 @@ public abstract class EnemyBase : MonoBehaviour
 
     protected virtual void Die()
     {
+        ScoreManager scoreManager = FindObjectOfType<ScoreManager>();
+        if (scoreManager != null)
+        {
+            scoreManager.AddEnemyScore(scoreValue);
+        }
         Destroy(gameObject);
     }
 
