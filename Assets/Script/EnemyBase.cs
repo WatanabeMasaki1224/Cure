@@ -21,7 +21,7 @@ public abstract class EnemyBase : MonoBehaviour
         currentHP -= damage;
         Debug.Log("ƒ_ƒ[ƒW");
 
-        if (currentHP < 0)
+        if (currentHP <= 0)
         {
             Die();
         }

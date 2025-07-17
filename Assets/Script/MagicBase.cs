@@ -13,6 +13,12 @@ public abstract class MagicBase : MonoBehaviour
     public virtual void SetDirection(Vector2 dir)
     {
         direction = dir.normalized;
+        var spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            // X方向がマイナスなら画像を左右反転
+            spriteRenderer.flipX = (dir.x > 0);
+        }
         Destroy(gameObject,lifeTime);
     }
 
