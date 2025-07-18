@@ -29,6 +29,7 @@ public class PlayerContoroller : MonoBehaviour
     public float respownTime;
     private bool isDead = false;
     private RebirthMagic rebirthMagic;
+    private GameObject currentRebirthMagic;
 
     // Start is called before the first frame update
     void Start()
@@ -66,15 +67,33 @@ public class PlayerContoroller : MonoBehaviour
             Vector2 dir = isFacingRight ? Vector2.right : Vector2.left;
             bullet.GetComponent<MagicBullet>().SetDirection(dir);
         }
-        
+
         //çƒê∂ñÇñ@
         if (Input.GetKeyDown(KeyCode.V))
         {
-            rebirthMagic?.StartHealing();
+            if (currentRebirthMagic == null)
+            {
+                currentRebirthMagic =Instantiate(rebirthMagicPrefab, magicSpawnPoint.position, Quaternion.identity);
+                RebirthMagic magic = currentRebirthMagic.GetComponent<RebirthMagic>();
+                  if(magic != null)
+                {
+                    magic.StartHealing();
+                }
+            }
         }
-        else if (Input.GetKeyUp(KeyCode.V))
+
+        if (Input.GetKeyUp(KeyCode.V))
         {
-            rebirthMagic?.StopHealing();
+            if (currentRebirthMagic != null)
+            {
+                RebirthMagic magic = currentRebirthMagic.GetComponent<RebirthMagic>();
+                if (magic != null)
+                {
+                    magic.StopHealing();
+                }
+                Destroy(currentRebirthMagic);
+                currentRebirthMagic=null;
+            }
         }
     }
 
