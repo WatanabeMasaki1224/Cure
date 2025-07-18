@@ -17,15 +17,15 @@ public class RepairPoint : MonoBehaviour
     }
 
     //ダメージ受けたときの処理
-    public void TakeDmage(int damage)
+    public void TakeDamage(int damage)
     {
         currentHP -= damage;
         if (currentHP <= 0)
         {
-            currentHP = 0;
-            CheakRepairAtateChanged();
-            UpdateVisuals();
+            currentHP = 0;  
         }
+        CheakRepairStateChanged();
+        UpdateVisuals();
     }
     //再生魔法で修復
     public void Repair(int repairAmount)
@@ -34,10 +34,9 @@ public class RepairPoint : MonoBehaviour
         if (currentHP > maxHp)
         {
             currentHP = maxHp;
-            CheakRepairAtateChanged();
-            UpdateVisuals();
-
         }
+        CheakRepairStateChanged();
+        UpdateVisuals();
     }
 
     public bool IsFullyRepaired() 
@@ -45,7 +44,7 @@ public class RepairPoint : MonoBehaviour
         return isFullyRepaired;
     }
 
-    private void CheakRepairAtateChanged()
+    private void CheakRepairStateChanged()
     {
         bool wasFullyRepaired = isFullyRepaired;
         isFullyRepaired = (currentHP >= maxHp);
@@ -62,5 +61,20 @@ public class RepairPoint : MonoBehaviour
         // 例：HPに応じて色を変えたり、エフェクトを変えるなど
         float t = (float)currentHP / maxHp;
         // ここに見た目更新処理
+        Color color = Color.Lerp(Color.red,Color.green,t);
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        Debug.Log($"[UpdateVisuals] HP: {currentHP}, Color: {color}");
+        if (sr != null )
+        {
+            sr.color = color;
+        }
+        else
+        {
+            Debug.LogWarning("SpriteRenderer が見つかりません");
+        }
+    }
+    public bool IsAttackable()
+    {
+        return currentHP > 0;
     }
 }

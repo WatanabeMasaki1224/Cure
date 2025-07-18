@@ -30,6 +30,8 @@ public class RebirthMagic : MonoBehaviour
     {
         while (true)
         {
+            Debug.Log("‰ñ•œƒ‹[ƒvÀs’†");
+
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, healRadius, repairLayer);
             foreach(var hit in hits)
             {
@@ -37,6 +39,7 @@ public class RebirthMagic : MonoBehaviour
                 if (rp != null && !rp.IsFullyRepaired())
                 {
                     rp.Repair(healAmount);
+                  
                 }
             }
 
