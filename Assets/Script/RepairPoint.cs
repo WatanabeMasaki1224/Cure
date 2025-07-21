@@ -54,6 +54,11 @@ public class RepairPoint : MonoBehaviour
             // 修復状態が変わったのでイベント通知
             OnRepairStateChanged?.Invoke(this, isFullyRepaired);
         }
+
+        if(!wasFullyRepaired && currentHP <= 0)
+        {
+            ScoreManager.Instance?.RepairPointBroken(this);
+        }
     }
 
     private void UpdateVisuals()

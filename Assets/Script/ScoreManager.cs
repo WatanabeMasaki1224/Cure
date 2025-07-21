@@ -25,6 +25,11 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         UpdateScoreText();
+        RepairPoint[] allpoint = FindObjectsOfType<RepairPoint>();
+        foreach (RepairPoint rp in allpoint)
+        {
+            rp.OnRepairStateChanged += OnRepairPointStateChanged;
+        }
     }
 
     // シーン切り替え時に、Textが変わったら呼ぶためのメソッド
@@ -32,6 +37,7 @@ public class ScoreManager : MonoBehaviour
     {
         scoreText = newScoreText;
         UpdateScoreText();
+        
     }
 
     public void OnRepairPointStateChanged(RepairPoint rp, bool isFullyRepaired)
@@ -40,10 +46,12 @@ public class ScoreManager : MonoBehaviour
         {
             score += 100; // 修復成功の得点例     
         }
-        else
-        {
-            score -= 50; // 壊されたペナルティ例
-        }
+        UpdateScoreText();
+    }
+
+    public void RepairPointBroken(RepairPoint rp)
+    {
+        score -= 50;
         UpdateScoreText();
     }
  

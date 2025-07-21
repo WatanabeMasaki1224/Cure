@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;  // UIï\é¶óp
+
 
 public class PlayerContoroller : MonoBehaviour
 {
@@ -30,6 +30,8 @@ public class PlayerContoroller : MonoBehaviour
     private bool isDead = false;
     private RebirthMagic rebirthMagic;
     private GameObject currentRebirthMagic;
+    public Image hpBarImage;  // Å© UnityÇ≈ïRÇ√ÇØÇÈ
+
 
     // Start is called before the first frame update
     void Start()
@@ -38,6 +40,7 @@ public class PlayerContoroller : MonoBehaviour
         col = GetComponent<Collider2D>();
         currentHP = maxHP;
         rebirthMagic = GetComponent<RebirthMagic>();
+        HPBar();
     }
 
     // Update is called once per frame
@@ -132,6 +135,7 @@ public class PlayerContoroller : MonoBehaviour
     {
         currentHP -= damage;
         Debug.Log(currentHP);
+        HPBar();
 
         if (isDead)
         {
@@ -166,9 +170,18 @@ public class PlayerContoroller : MonoBehaviour
     {
         transform.position = respawnPoint.position;
         currentHP = maxHP;
+        HPBar();
         //ãììÆïúäà
         rb.isKinematic = false ;
         col.enabled = true ;
         isDead = false ;
+    }
+
+    private void HPBar()
+    {
+        if(hpBarImage != null)
+        {
+            hpBarImage.fillAmount = (float)currentHP / maxHP;
+        }
     }
 }
