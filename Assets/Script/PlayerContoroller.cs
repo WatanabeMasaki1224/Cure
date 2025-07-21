@@ -7,12 +7,14 @@ using UnityEngine.UI;
 
 public class PlayerContoroller : MonoBehaviour
 {
+    [Header("ステータス")]
     public float _moveSpeed = 1;
     public float _jumpPower = 1;
     public int _maxJumpCount = 1;
     private int _jumpCount = 0;
     public int maxHP = 10;
     private int currentHP;
+    [Header("接地判定")]
     public Transform groundCheck;
     public float groundRadius = 0.2f;
     public LayerMask groundLayer;
@@ -21,10 +23,16 @@ public class PlayerContoroller : MonoBehaviour
     private bool isGrounded;
     private float moveInput;
     private bool isFacingRight = true;
+    [Header("魔法")]
     public GameObject magicBulletPrefub;
     public GameObject rebirthMagicPrefab;    // 再生魔法のプレハブ
     public Transform magicSpawnPoint;        // 再生魔法を出す位置
     public Transform firePoint;
+    public int maxMagicUse = 5;
+    private int magicUse;
+    public float magicCooldown;
+    private float lastMagicTime = -Mathf.Infinity;
+    [Header("リスポーン")]
     public Transform respawnPoint;
     public float respownTime;
     private bool isDead = false;
@@ -62,15 +70,19 @@ public class PlayerContoroller : MonoBehaviour
         {
             Flip();
         }
-        
-        //通常魔法
-        if(Input.GetKeyDown(KeyCode.Z))
-        {
-            GameObject bullet = Instantiate(magicBulletPrefub,firePoint.position,Quaternion.identity);
-            Vector2 dir = isFacingRight ? Vector2.right : Vector2.left;
-            bullet.GetComponent<MagicBullet>().SetDirection(dir);
-        }
 
+        //通常魔法
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            if (Time.time - lastMagicTime >= magicCooldown)
+            {
+                GameObject bullet = Instantiate(magicBulletPrefub, firePoint.position, Quaternion.identity);
+                Vector2 dir = isFacingRight ? Vector2.right : Vector2.left;
+                bullet.GetComponent<MagicBullet>().SetDirection(dir);
+                lastMagicTime = Time.time;
+                Debug.Log("魔法発射");
+            }
+        }
         //再生魔法
         if (Input.GetKeyDown(KeyCode.V))
         {

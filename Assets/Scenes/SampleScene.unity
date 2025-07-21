@@ -792,6 +792,8 @@ MonoBehaviour:
   rebirthMagicPrefab: {fileID: 972984785783221131, guid: 28fb44b8cf6c78b4e9b749f3917a3e03, type: 3}
   magicSpawnPoint: {fileID: 1735743617}
   firePoint: {fileID: 2037632002}
+  maxMagicUse: 5
+  magicCooldown: 1
   respawnPoint: {fileID: 1844236435}
   respownTime: 2
   hpBarImage: {fileID: 1550041680}
@@ -1211,7 +1213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.2901961, g: 0.41960785, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
