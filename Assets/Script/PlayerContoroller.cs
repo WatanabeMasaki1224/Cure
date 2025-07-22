@@ -26,12 +26,15 @@ public class PlayerContoroller : MonoBehaviour
     [Header("魔法")]
     public GameObject magicBulletPrefub;
     public GameObject rebirthMagicPrefab;    // 再生魔法のプレハブ
-    public Transform magicSpawnPoint;        // 再生魔法を出す位置
-    public Transform firePoint;
+    public Transform magicSpawnPoint;        // 再生魔法を出す位置（円形）
+    public Transform firePoint;             // 魔法のだす位置
     public int maxMagicUse = 5;
     private int magicUse;
     public float magicCooldown;
     private float lastMagicTime = -Mathf.Infinity;
+    public float reviveTime = 5;   //復活魔法の長押し時間
+    private float reviveTimer = 0;
+    private bool revive = false;
     [Header("リスポーン")]
     public Transform respawnPoint;
     public float respownTime;
@@ -109,6 +112,22 @@ public class PlayerContoroller : MonoBehaviour
                 Destroy(currentRebirthMagic);
                 currentRebirthMagic=null;
             }
+        }
+
+        //復活魔法
+        if(Input.GetKey(KeyCode.B))
+        {
+            reviveTime = Time.time;
+            if(!revive && reviveTimer >= reviveTime )
+            {
+                revive = true;
+                ReviveNPC();
+            }
+        }
+        else
+        {
+            reviveTime = 0f;
+            revive = false;
         }
     }
 
