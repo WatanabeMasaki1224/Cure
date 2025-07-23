@@ -5,9 +5,10 @@ using UnityEngine;
 public class NPC : MonoBehaviour
 {
     public  bool revived = false;
-    public GameObject magic;
+   
+    public string magicName;
   
-    public void Revaived()
+    public void Revive()
     {
         if (revived)
         {
@@ -16,7 +17,17 @@ public class NPC : MonoBehaviour
 
         revived = true;
         Debug.Log("•œŠˆ");
+        GetComponent<SpriteRenderer>().color = Color.white;
     }
 
-   
+    public bool IsRevived()
+    {
+        return revived;
+    }
+
+    public string GetMagicName()
+    {
+        return magicName;
+    }
+
 }

@@ -33,8 +33,9 @@ public class PlayerContoroller : MonoBehaviour
     public float magicCooldown;
     private float lastMagicTime = -Mathf.Infinity;
     public float reviveTime = 5;   //復活魔法の長押し時間
-    private float reviveTimer = 0;
     private bool revive = false;
+    private float reviveHoldStartTime = 0f;
+    private float reviveTimer = 0;
     [Header("リスポーン")]
     public Transform respawnPoint;
     public float respownTime;
@@ -115,19 +116,44 @@ public class PlayerContoroller : MonoBehaviour
         }
 
         //復活魔法
-        if(Input.GetKey(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.B))
         {
-            reviveTime = Time.time;
-            if(!revive && reviveTimer >= reviveTime )
+            reviveHoldStartTime = Time.time;  // 押し始めた時刻を記録
+            revive = false;
+        }
+
+        if (Input.GetKey(KeyCode.B))
+        {
+            float heldTime = Time.time - reviveHoldStartTime;
+            if (!revive && heldTime >= reviveTime)  // reviveTimeは「必要長押し秒数」
             {
                 revive = true;
                 ReviveNPC();
+                Debug.Log("復活");
             }
         }
-        else
+
+        if (Input.GetKeyUp(KeyCode.B))
         {
-            reviveTime = 0f;
             revive = false;
+        }
+
+        //NPCとの会話ボタン
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 1.5f);
+            foreach(var hit in hits)
+            {
+                NPC npc = hit.GetComponent<NPC>();
+                if (npc != null && npc.IsRevived()) 
+                {
+                    string magic = npc.GetMagicName();
+                    GetComponent<SpecialMagicController>().SetSpecialMagic(magic);
+                    Debug.Log("会話");
+                    break;
+                   
+                }
+            }
         }
     }
 
@@ -214,5 +240,24 @@ public class PlayerContoroller : MonoBehaviour
         {
             hpBarImage.fillAmount = (float)currentHP / maxHP;
         }
+    }
+
+    void ReviveNPC()
+    {
+        Debug.Log("ReviveNPCが呼ばれました");
+        float revive = 1.5f;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, revive);
+        foreach(var hit in hits)
+        {
+            NPC npc = hit.GetComponent<NPC>();
+            if(npc != null && !npc.IsRevived())
+            {
+                npc.Revive();
+                Debug.Log("NPCを復活させました");
+                break;
+            }
+        }
+        
+
     }
 }
