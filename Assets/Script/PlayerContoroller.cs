@@ -120,6 +120,7 @@ public class PlayerContoroller : MonoBehaviour
         {
             reviveHoldStartTime = Time.time;  // 押し始めた時刻を記録
             revive = false;
+            Debug.Log("Bキー");
         }
 
         if (Input.GetKey(KeyCode.B))
