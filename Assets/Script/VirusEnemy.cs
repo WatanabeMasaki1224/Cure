@@ -65,4 +65,18 @@ public class VirusEnemy : EnemyBase
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.CompareTag("Player"))
+        {
+            PlayerContoroller player = collision.GetComponent<PlayerContoroller>();
+            if (player != null)
+            {
+                player.TakeDmage(damageToPlayer);
+            }
+            selfDestroy = true;
+            Die();
+        }
+    }
+
 }
