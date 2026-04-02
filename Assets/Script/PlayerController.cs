@@ -11,9 +11,20 @@ public class PlayerController : MonoBehaviour
 
     
     [SerializeField] float moveSpeed = 1f;
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] Transform firePosition;
+    [SerializeField] float attackDuration = 0.5f;
+    [SerializeField] float jumpPower = 5f;
+    float attackTimer = 0f;
     private Rigidbody2D rb;
     Vector2 moveInput;
     PlayerState state;
+    private Vector2 lastDirection = Vector2.right;
+    // 地面判定
+    [SerializeField] Transform grounndCheck;
+    [SerializeField] float checkRadius = 0.1f;
+    [SerializeField] LayerMask groundLayer;
+    private bool isGround;
 
     void Start()
     {
@@ -26,16 +37,56 @@ public class PlayerController : MonoBehaviour
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput = moveInput.normalized;
+
+        // 横方向の入力があるときだけ lastFacing を更新
+        if (moveInput.x != 0)
+        {
+            lastDirection = new Vector2(Mathf.Sign(moveInput.x), 0);
+        }
+
+        if (state == PlayerState.Attack)
+        {
+            attackTimer -= Time.deltaTime;
+            if(attackTimer < 0f)
+            {
+                state = PlayerState.Normal;
+            }
+            return;
+        }
+
+        if(Input.GetKeyDown(KeyCode.F))
+        {
+            Attack();
+        }
+
+        if(Input.GetKeyDown(KeyCode.Space) && isGround)
+        {
+            rb.linearVelocity  = new Vector2(rb.linearVelocity.x, jumpPower);
+        }
     }
 
     private void FixedUpdate()
     {
+        isGround = Physics2D.OverlapCircle(grounndCheck.position,checkRadius,groundLayer);
+
         if (state != PlayerState.Normal)
         {
             rb.linearVelocity = Vector2.zero;
             return;
         }
 
-        rb.linearVelocity = moveInput * moveSpeed;
+        rb.linearVelocity = new Vector2(moveInput.x * moveSpeed , rb.linearVelocity.y);
+    }
+
+    void Attack()
+    {
+        state = PlayerState.Attack;
+        attackTimer = attackDuration;
+        Vector2 dir = lastDirection;
+        // 入力がない時は右向き（仮）
+        if (dir == Vector2.zero)
+            dir = Vector2.right;
+        GameObject bullet = Instantiate(bulletPrefab, firePosition.position, Quaternion.identity);
+        bullet.GetComponent<Bullet>().Init(dir);
     }
 }
