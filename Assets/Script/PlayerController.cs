@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float checkRadius = 0.1f;
     [SerializeField] LayerMask groundLayer;
     private bool isGround;
+    RepairPoint currentRepairPoint;
 
     void Start()
     {
@@ -63,6 +64,24 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity  = new Vector2(rb.linearVelocity.x, jumpPower);
         }
+
+        // Repair開始
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            PlayerStartRepair();
+        }
+
+        // Repair終了
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            PlayerStopRepair();
+        }
+
+        // Repair中の進行
+        if (state == PlayerState.Repair)
+        {
+            PlayerUpdateRepair();
+        }
     }
 
     private void FixedUpdate()
@@ -88,5 +107,53 @@ public class PlayerController : MonoBehaviour
             dir = Vector2.right;
         GameObject bullet = Instantiate(bulletPrefab, firePosition.position, Quaternion.identity);
         bullet.GetComponent<Bullet>().Init(dir);
+    }
+
+    void PlayerStartRepair()
+    {
+        if (state == PlayerState.Attack) return;
+        if (currentRepairPoint == null) return;
+
+        state = PlayerState.Repair;
+        currentRepairPoint.StartRepair();
+    }
+
+    void PlayerStopRepair()
+    {
+        if (state != PlayerState.Repair) return;
+
+        currentRepairPoint?.StopRepair();
+        state = PlayerState.Normal;
+    }
+
+    void PlayerUpdateRepair()
+    {
+        if(currentRepairPoint == null) return;
+        bool completed = currentRepairPoint.UpdateRepair(Time.deltaTime);
+
+        if (completed)
+        {
+            state = PlayerState.Normal;
+            currentRepairPoint = null;
+
+          　//修復成功スコア
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.CompareTag("Repair"))
+        {
+            currentRepairPoint = other.GetComponent<RepairPoint>();
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if(other.CompareTag("Repair"))
+        {
+            currentRepairPoint = null;
+            PlayerStopRepair();
+        }
     }
 }
