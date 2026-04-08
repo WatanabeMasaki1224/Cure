@@ -111,8 +111,13 @@ public class PlayerController : MonoBehaviour
 
     void PlayerStartRepair()
     {
+        Debug.Log("StartRepair呼ばれた");
         if (state == PlayerState.Attack) return;
-        if (currentRepairPoint == null) return;
+        if (currentRepairPoint == null)
+        {
+            Debug.Log("RepairPointがnull");
+            return;
+        }
 
         state = PlayerState.Repair;
         currentRepairPoint.StartRepair();
@@ -144,6 +149,7 @@ public class PlayerController : MonoBehaviour
     {
         if(other.CompareTag("Repair"))
         {
+            Debug.Log("RepairPoint検知");
             currentRepairPoint = other.GetComponent<RepairPoint>();
         }
     }
@@ -155,5 +161,14 @@ public class PlayerController : MonoBehaviour
             currentRepairPoint = null;
             PlayerStopRepair();
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        // HPあるなら減らす
+        Debug.Log("Player Damage: " + damage);
+
+        // とりあえず今はログでもOK
+        // あとでHP減らす・ノックバック・無敵時間入れる
     }
 }

@@ -22,14 +22,14 @@ public class RepairManager : MonoBehaviour
         points.Remove(point);
     }
 
-    public RepairPoint GetClosestBroken(Vector2 pos)
+    public RepairPoint GetClosestTarget(Vector2 pos)
     {
         float minDist = Mathf.Infinity;
         RepairPoint closest = null;
 
         foreach (var p in points)
         {
-            if (p.state != RepairPoint.RepairState.Repaired)
+            if (p.state == RepairPoint.RepairState.Repairing || p.state == RepairPoint.RepairState.Repaired)
             {
                 float dist = Vector2.Distance(pos, p.transform.position);
                 if (dist < minDist)

@@ -3,9 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName ="Enemy/EnemyData")]
 public class EnemyData : ScriptableObject
 {
-    public float moveSpeed;
+    public int moveSpeed;
     public int maxHP;
-    public float attaclPower;
+    public int attackPower;
     public EnemyType type;
 }
 

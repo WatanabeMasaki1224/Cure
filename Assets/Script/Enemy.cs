@@ -31,9 +31,9 @@ public class Enemy : MonoBehaviour
         else // Repair狙い
         {
             // ターゲット更新
-            if (targetRepair == null || targetRepair.state == RepairPoint.RepairState.Repaired)
+            if (targetRepair == null || targetRepair.state == RepairPoint.RepairState.Broken)
             {
-                targetRepair = RepairManager.Instance.GetClosestBroken(transform.position);
+                targetRepair = RepairManager.Instance.GetClosestTarget(transform.position);
             }
 
             if (targetRepair != null)
@@ -54,18 +54,19 @@ public class Enemy : MonoBehaviour
     }
 
     // プレイヤーに接触
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        Debug.Log("Hit: " + other.name + " Tag:" + other.tag);
+        if (other.CompareTag("Player"))
         {
-            // ダメージ処理（あとで実装）
-            Debug.Log("Player Damage");
+            PlayerController player = other.GetComponent<PlayerController>();
+            if (player != null)
+            {
+                player.TakeDamage(data.attackPower);
+            }
+            Destroy(gameObject);
         }
-    }
 
-    //修復ポイントに接触
-    void OnTriggerStay2D(Collider2D other)
-    {
         if (data.type != EnemyType.TargetRepair) return;
 
         if (other.CompareTag("Repair"))
@@ -74,13 +75,11 @@ public class Enemy : MonoBehaviour
 
             if (rp != null && rp.state == RepairPoint.RepairState.Repaired)
             {
-                // 壊す
-                rp.state = RepairPoint.RepairState.Broken;
-
-                // スコアマイナスとかここ
-                Debug.Log("Repair Destroyed");
+                rp.TakeDamage();
             }
+            Destroy(gameObject) ;
         }
+
     }
 
     // ダメージ処理

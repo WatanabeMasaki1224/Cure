@@ -846,6 +846,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   magicBulletPrefub: {fileID: 4726780099353223802, guid: 6ffe2801063a5cd43bd682882203049d, type: 3}
+  magicPiercePrefub: {fileID: 6214913640097131941, guid: 78d4733823afacf41b9872ad9cdd0452, type: 3}
   rebirthMagicPrefab: {fileID: 972984785783221131, guid: 28fb44b8cf6c78b4e9b749f3917a3e03, type: 3}
   magicSpawnPoint: {fileID: 1735743617}
   firePoint: {fileID: 2037632002}
