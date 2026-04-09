@@ -149,8 +149,11 @@ public class PlayerController : MonoBehaviour
     {
         if(other.CompareTag("Repair"))
         {
-            Debug.Log("RepairPointŒŸ’m");
-            currentRepairPoint = other.GetComponent<RepairPoint>();
+            RepairPoint rp = other.GetComponent<RepairPoint>();
+            if (rp != null)
+            {
+                currentRepairPoint = rp;
+            }
         }
     }
 
@@ -158,8 +161,13 @@ public class PlayerController : MonoBehaviour
     {
         if(other.CompareTag("Repair"))
         {
-            currentRepairPoint = null;
-            PlayerStopRepair();
+            RepairPoint rp = other.GetComponent<RepairPoint>();
+
+            if (rp == currentRepairPoint)
+            {
+                currentRepairPoint = null;
+                PlayerStopRepair();
+            }
         }
     }
 

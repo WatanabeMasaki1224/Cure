@@ -54,12 +54,18 @@ public class RepairPoint : MonoBehaviour
 
     void OnEnable()
     {
-        RepairManager.Instance.Register(this);
+        if(RepairManager.Instance != null)
+        {
+            RepairManager.Instance.Register(this);
+        }
     }
 
     void OnDisable()
     {
-        RepairManager.Instance.Unregister(this);
+        if(RepairManager.Instance != null)
+        {
+            RepairManager.Instance.Unregister(this);
+        }
     }
 
     void UpdateColor()
