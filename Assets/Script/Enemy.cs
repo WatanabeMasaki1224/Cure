@@ -7,6 +7,9 @@ public class Enemy : MonoBehaviour
     Transform player;
     RepairPoint targetRepair;
     int currentHP;
+    Spawner spawner;
+    EnemyData myData;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -30,10 +33,25 @@ public class Enemy : MonoBehaviour
         }
         else // Repair狙い
         {
-            // ターゲット更新
             if (targetRepair == null || targetRepair.state == RepairPoint.RepairState.Broken)
             {
-                targetRepair = RepairManager.Instance.GetClosestTarget(transform.position);
+                RepairPoint[] all = GameObject.FindObjectsByType<RepairPoint>(FindObjectsSortMode.None);
+                float minDist = Mathf.Infinity;
+                targetRepair = null;
+
+                foreach (var rp in all)
+                {
+                    if (rp.state != RepairPoint.RepairState.Broken)
+                    {
+                        float dist = Vector2.Distance(transform.position, rp.transform.position);
+
+                        if (dist < minDist)
+                        {
+                            minDist = dist;
+                            targetRepair = rp;
+                        }
+                    }
+                }
             }
 
             if (targetRepair != null)
@@ -71,7 +89,7 @@ public class Enemy : MonoBehaviour
 
         if (other.CompareTag("Repair"))
         {
-            RepairPoint rp = other.GetComponent<RepairPoint>();
+            RepairPoint rp = other.GetComponentInParent<RepairPoint>();
 
             if (rp != null && rp.state == RepairPoint.RepairState.Repaired)
             {
@@ -93,4 +111,10 @@ public class Enemy : MonoBehaviour
         }
     }
 
+
+    public void Init(Spawner spawner, EnemyData data)
+    {
+        this.spawner = spawner;
+        this.myData = data;
+    }
 }

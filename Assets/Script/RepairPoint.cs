@@ -17,6 +17,11 @@ public class RepairPoint : MonoBehaviour
     [SerializeField] Color repairingColor = Color.yellow;
     [SerializeField] Color repairedColor = Color.green;
 
+    private void Start()
+    {
+        UpdateColor();
+    }
+
     public void StartRepair()
     {
         if (state == RepairState.Broken)

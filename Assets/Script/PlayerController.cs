@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform firePosition;
     [SerializeField] float attackDuration = 0.5f;
     [SerializeField] float jumpPower = 5f;
+    [SerializeField] float repairRange = 1f;
     float attackTimer = 0f;
     private Rigidbody2D rb;
     Vector2 moveInput;
@@ -55,7 +56,21 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(Input.GetKeyDown(KeyCode.F))
+        // 毎フレーム リペア対象を取得
+        currentRepairPoint = null;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, repairRange);
+
+        foreach (var h in hits)
+        {
+            if (h.CompareTag("Repair"))
+            {
+                currentRepairPoint = h.GetComponentInParent<RepairPoint>();
+                break;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
         {
             Attack();
         }
@@ -142,32 +157,6 @@ public class PlayerController : MonoBehaviour
             currentRepairPoint = null;
 
           　//修復成功スコア
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if(other.CompareTag("Repair"))
-        {
-            RepairPoint rp = other.GetComponent<RepairPoint>();
-            if (rp != null)
-            {
-                currentRepairPoint = rp;
-            }
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if(other.CompareTag("Repair"))
-        {
-            RepairPoint rp = other.GetComponent<RepairPoint>();
-
-            if (rp == currentRepairPoint)
-            {
-                currentRepairPoint = null;
-                PlayerStopRepair();
-            }
         }
     }
 
