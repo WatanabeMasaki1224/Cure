@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,6 +18,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float attackDuration = 0.5f;
     [SerializeField] float jumpPower = 5f;
     [SerializeField] float repairRange = 1f;
+    [SerializeField] int maxHP = 5;
+    private int currentHP;
     float attackTimer = 0f;
     private Rigidbody2D rb;
     Vector2 moveInput;
@@ -27,10 +31,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     private bool isGround;
     RepairPoint currentRepairPoint;
+    [SerializeField] float knockbackForce = 5f;
+    [SerializeField] int desPenaluty = 50;
+    bool isInvincible = false;
+    [SerializeField] float respawnTime = 3f;
+    [SerializeField] Transform respawnPoint;
+
+    bool isDead = false;
+    SpriteRenderer sr;
+    Collider2D col;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();   
+        rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
+        col = GetComponent<Collider2D>();
+        currentHP = maxHP;
     }
 
     // Update is called once per frame
@@ -162,10 +178,63 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        // HPあるなら減らす
-        Debug.Log("Player Damage: " + damage);
+        if(isInvincible)  return;
 
-        // とりあえず今はログでもOK
-        // あとでHP減らす・ノックバック・無敵時間入れる
+        currentHP -= damage;
+        if(currentHP <= 0)
+        {
+            Die();
+        }
+
+        StartCoroutine(InvincibleCoroutine());
+        Vector2 knockDir = (transform.position - Camera.main.transform.position).normalized;
+        rb.linearVelocity = knockDir * knockbackForce;
+    }
+
+    IEnumerator InvincibleCoroutine()
+    {
+        isInvincible = true;
+        for (int i = 0; i < 5; i++)
+        {
+            sr.enabled = false;
+            yield return new WaitForSeconds(0.05f);
+
+            sr.enabled = true;
+            yield return new WaitForSeconds(0.05f);
+        }
+        isInvincible = false;
+    }
+
+    void Die()
+    {
+        if (isDead) return;
+  
+        isDead = true;
+        ScoreManager.Instance.Sub(desPenaluty);
+        sr.color = new Color(1f, 1f, 1f, 0f);
+        col.enabled = false;
+        rb.linearVelocity = Vector2.zero;
+        StartCoroutine(RespawnCoroutine());
+    }
+
+    IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(respawnTime);
+
+        // 位置リセット
+        transform.position = respawnPoint.position;
+
+        // HP回復
+        currentHP = maxHP;
+
+        // 復活
+        sr.color = new Color(1f, 1f, 1f, 1f);
+        col.enabled = true;
+        isDead = false;
+    }
+
+    public bool IsDead()
+    {
+        return isDead;
     }
 }

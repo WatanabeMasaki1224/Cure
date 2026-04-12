@@ -16,6 +16,9 @@ public class RepairPoint : MonoBehaviour
     [SerializeField] Color brokenColor = Color.red;
     [SerializeField] Color repairingColor = Color.yellow;
     [SerializeField] Color repairedColor = Color.green;
+    [SerializeField] int repairScore = 50;
+    [SerializeField] int breakRepairPontScore = 30;
+    [SerializeField] int sustainableScore = 2;
 
     private void Start()
     {
@@ -52,6 +55,7 @@ public class RepairPoint : MonoBehaviour
         {
             state =RepairState.Repaired;
             UpdateColor();
+            ScoreManager.Instance.Add(repairScore);
             return true;
         }
         return false;
@@ -97,10 +101,8 @@ public class RepairPoint : MonoBehaviour
         {
             state = RepairState.Broken;
             UpdateColor();
-
+            ScoreManager.Instance.Sub(breakRepairPontScore);
             Debug.Log("Repair Destroyed");
-
-            // スコアマイナスここ
         }
     }
 }

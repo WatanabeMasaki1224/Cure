@@ -10,6 +10,7 @@ public class EnemyData : ScriptableObject
     public GameObject prefab;
     public int maxCount;     // ‚±‚Ì“G‚ÌÅ‘å”
     public float spawnRate;  // oŒ»—¦id‚İ
+    public int score;
 }
 
 public enum EnemyType

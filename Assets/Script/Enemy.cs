@@ -1,3 +1,4 @@
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -9,6 +10,7 @@ public class Enemy : MonoBehaviour
     int currentHP;
     Spawner spawner;
     EnemyData myData;
+    [SerializeField] int _score = 10;
 
     void Start()
     {
@@ -27,9 +29,16 @@ public class Enemy : MonoBehaviour
     // ターゲット決定
     Vector2 GetTargetPosition()
     {
+        PlayerController pc = player.GetComponent<PlayerController>();
+        bool playerAlive = pc != null && !pc.IsDead();
+
         if (data.type == EnemyType.TargetPlayer)
         {
-            return player.position;
+            if (playerAlive)
+                return player.position;
+
+            // 死んでたらその場待機
+            return transform.position;
         }
         else // Repair狙い
         {
@@ -60,7 +69,13 @@ public class Enemy : MonoBehaviour
             }
 
             // 無ければプレイヤー
-            return player.position;
+            if (playerAlive)
+            {
+                return player.position;
+            }
+
+            // どっちも無いなら停止
+            return transform.position;
         }
     }
 
@@ -101,13 +116,13 @@ public class Enemy : MonoBehaviour
     }
 
     // ダメージ処理
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, GameObject attacker)
     {
         currentHP -= damage;
 
         if (currentHP <= 0)
         {
-            Destroy(gameObject);
+            Die(attacker);
         }
     }
 
@@ -116,5 +131,16 @@ public class Enemy : MonoBehaviour
     {
         this.spawner = spawner;
         this.myData = data;
+    }
+
+    void Die(GameObject attaacker)
+    {
+        if(attaacker.CompareTag("Bullet"))
+        {
+            ScoreManager.Instance.Add(data.score);
+        }
+
+        spawner?.OnEnemyDead(data);
+        Destroy(gameObject);
     }
 }

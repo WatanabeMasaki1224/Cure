@@ -5,6 +5,7 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] float speed = 10f;
     [SerializeField] float lifeTime = 2f;
+    [SerializeField] int damage = 1;
     Vector2 direction;
 
     public void Init(Vector2 dir)
@@ -22,6 +23,11 @@ public class Bullet : MonoBehaviour
     {
         if(other.CompareTag("Enemy"))
         {
+            Enemy enemy = other.GetComponent<Enemy>();
+            if(enemy != null)
+            {
+                enemy.TakeDamage(damage, gameObject);
+            }
             Destroy(gameObject);
         }
     }
