@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour
     bool isDead = false;
     SpriteRenderer sr;
     Collider2D col;
+    [SerializeField] Text hpText;
 
     void Start()
     {
@@ -47,6 +49,7 @@ public class PlayerController : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
         currentHP = maxHP;
+        HPUI();
     }
 
     // Update is called once per frame
@@ -181,6 +184,7 @@ public class PlayerController : MonoBehaviour
         if(isInvincible)  return;
 
         currentHP -= damage;
+        HPUI();
         if(currentHP <= 0)
         {
             Die();
@@ -236,5 +240,10 @@ public class PlayerController : MonoBehaviour
     public bool IsDead()
     {
         return isDead;
+    }
+
+    public void HPUI()
+    {
+        hpText.text = "HP: " + currentHP;
     }
 }
