@@ -1,14 +1,9 @@
+using System.Runtime.CompilerServices;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    enum EnemyState
-    {
-        Patrol, // うろうろ
-        Chase   // 追跡
-    }
-
     [SerializeField] EnemyData data;
     Rigidbody2D rb;
     Transform player;
@@ -21,10 +16,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckDistance = 0.2f; //前にどれくらいずらしてチェックするか
     [SerializeField] float groundCheckOffset = 0.5f;//どのくらい下を見るか
-    EnemyState state = EnemyState.Patrol;
     [SerializeField] float patrolRange = 3f; // ウロウロ範囲
     float startX;
     float patrolDir = 1f;
+    Transform currentTarget;
 
     void Start()
     {
@@ -37,83 +32,49 @@ public class Enemy : MonoBehaviour
 
     void FixedUpdate()
     {
-        float distX = Mathf.Abs(player.position.x - transform.position.x);
+        if(data.type == EnemyType.TargetPlayer)
+        {
+            float distX = Mathf.Abs(player.position.x - transform.position.x);
+            float distY = Mathf.Abs(player.position.y - transform.position.y);
 
-        // 状態切り替え
-        if (distX <= chaseRange)
-        {
-            state = EnemyState.Chase;
-        }
-        else
-        {
-            state = EnemyState.Patrol;
+            if (distX <= chaseRange && distY <= 1f)
+            {
+                Move(player.position);
+            }
+
+            else
+            {
+                Patrol();
+            }
+            return;
         }
 
-        if (state == EnemyState.Chase)
+        currentTarget = FindTarget();
+        if (currentTarget != null)
         {
-            Vector2 targetPos = GetTargetPosition();
-            Move(targetPos);
+            float distX = Mathf.Abs(currentTarget.position.x - transform.position.x);
+
+            if (distX <= chaseRange)
+            {
+                Move(currentTarget.position);
+            }
+            else
+            {
+                Patrol();
+            }
         }
         else
         {
             Patrol();
         }
+
     }
 
-    // ターゲット決定
-    Vector2 GetTargetPosition()
-    {
-        PlayerController pc = player.GetComponent<PlayerController>();
-        bool playerAlive = pc != null && !pc.IsDead();
 
-        if (data.type == EnemyType.TargetPlayer)
-        {
-            if (playerAlive)
-                return player.position;
-
-            // 死んでたらその場待機
-            return transform.position;
-        }
-        else // Repair狙い
-        {
-            if (targetRepair == null || targetRepair.state == RepairPoint.RepairState.Broken)
-            {
-                RepairPoint[] all = GameObject.FindObjectsByType<RepairPoint>(FindObjectsSortMode.None);
-                float minDist = Mathf.Infinity;
-                targetRepair = null;
-
-                foreach (var rp in all)
-                {
-                    if (rp.state != RepairPoint.RepairState.Broken)
-                    {
-                        float dist = Vector2.Distance(transform.position, rp.transform.position);
-
-                        if (dist < minDist)
-                        {
-                            minDist = dist;
-                            targetRepair = rp;
-                        }
-                    }
-                }
-            }
-
-            if (targetRepair != null)
-            {
-                return targetRepair.transform.position;
-            }
-
-            // 無ければプレイヤー
-            if (playerAlive)
-            {
-                return player.position;
-            }
-
-            // どっちも無いなら停止
-            return transform.position;
-        }
-    }
-
-    // 移動
+    /// <summary>
+    /// 移動
+    /// </summary>
+    /// <param name="target"></param>
     void Move(Vector2 target)
     {
         // X距離だけで判定
@@ -226,5 +187,49 @@ public class Enemy : MonoBehaviour
         }
 
         rb.linearVelocity = new Vector2(patrolDir * data.moveSpeed, rb.linearVelocity.y);
+    }
+
+    Transform FindTarget()
+    {
+        //範囲内のリペアpointを探す
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(chaseRange*2f,0.1f),0);
+        float minDist = Mathf.Infinity;
+        RepairPoint nearest = null;
+
+        foreach(var hit in hits)
+        {
+            if(hit.CompareTag("Repair"))
+            {
+                RepairPoint rp = hit.GetComponentInParent<RepairPoint>();
+
+                if(rp != null && rp.state == RepairPoint.RepairState.Repaired)
+                {
+                    float distX = Mathf.Abs(rp.transform.position.x - transform.position.x);
+                    if(distX < minDist)
+                    {
+                        minDist = distX;
+                        nearest = rp;
+                    }
+                }
+            }
+        }
+
+        if(nearest != null)
+            return nearest.transform;
+
+        //プレイヤー探索
+        PlayerController pc = player.GetComponent<PlayerController>();
+        bool playerAlive = pc != null && !pc.IsDead();
+
+        if(playerAlive)
+        {
+            float distX = Mathf.Abs(player.position.x - transform.position.x);
+            float distY = Mathf.Abs(player.position.y - transform.position.y);
+
+            if (distX <= chaseRange && distY <= 1f)
+                return player;
+        }
+
+        return null;
     }
 }

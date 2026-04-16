@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     SpriteRenderer sr;
     Collider2D col;
     [SerializeField] Text hpText;
+    Animator anim;
 
     void Start()
     {
@@ -50,19 +51,27 @@ public class PlayerController : MonoBehaviour
         col = GetComponent<Collider2D>();
         currentHP = maxHP;
         HPUI();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isDead) return;
+
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput = moveInput.normalized;
+        anim.SetFloat("Speed", Mathf.Abs(moveInput.x));
+        anim.SetBool("IsGround", isGround);
 
-        // 横方向の入力があるときだけ lastFacing を更新
+        
         if (moveInput.x != 0)
         {
             lastDirection = new Vector2(Mathf.Sign(moveInput.x), 0);
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Sign(moveInput.x) * Mathf.Abs(scale.x);
+            transform.localScale = scale;
         }
 
         if (state == PlayerState.Attack)
@@ -92,6 +101,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
         {
             Attack();
+            anim.SetTrigger("Attack");
         }
 
         if(Input.GetKeyDown(KeyCode.Space) && isGround)
@@ -120,6 +130,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isDead) return;
+
         isGround = Physics2D.OverlapCircle(grounndCheck.position,checkRadius,groundLayer);
 
         if (state != PlayerState.Normal)
@@ -174,8 +186,6 @@ public class PlayerController : MonoBehaviour
         {
             state = PlayerState.Normal;
             currentRepairPoint = null;
-
-          　//修復成功スコア
         }
     }
 
@@ -185,39 +195,38 @@ public class PlayerController : MonoBehaviour
 
         currentHP -= damage;
         HPUI();
-        if(currentHP <= 0)
+        anim.SetTrigger("Hit");
+
+        if (currentHP <= 0)
         {
             Die();
+            return;
         }
 
         StartCoroutine(InvincibleCoroutine());
-        Vector2 knockDir = (transform.position - Camera.main.transform.position).normalized;
-        rb.linearVelocity = knockDir * knockbackForce;
     }
 
     IEnumerator InvincibleCoroutine()
     {
         isInvincible = true;
-        for (int i = 0; i < 5; i++)
-        {
-            sr.enabled = false;
-            yield return new WaitForSeconds(0.05f);
-
-            sr.enabled = true;
-            yield return new WaitForSeconds(0.05f);
-        }
+        yield return new WaitForSeconds(1.0f); // 無敵時間
         isInvincible = false;
     }
 
     void Die()
     {
         if (isDead) return;
-  
+
         isDead = true;
+
         ScoreManager.Instance.Sub(desPenaluty);
-        sr.color = new Color(1f, 1f, 1f, 0f);
+
+        anim.SetTrigger("Dead");
+
         col.enabled = false;
         rb.linearVelocity = Vector2.zero;
+        rb.simulated = false; 
+
         StartCoroutine(RespawnCoroutine());
     }
 
@@ -225,14 +234,12 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(respawnTime);
 
-        // 位置リセット
         transform.position = respawnPoint.position;
-
-        // HP回復
         currentHP = maxHP;
 
-        // 復活
-        sr.color = new Color(1f, 1f, 1f, 1f);
+        anim.Rebind();
+        anim.Update(0f);
+        rb.simulated = true;
         col.enabled = true;
         isDead = false;
     }
