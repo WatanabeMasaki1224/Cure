@@ -11,7 +11,10 @@ public class Bullet : MonoBehaviour
     public void Init(Vector2 dir)
     {
          direction = dir.normalized;
-         Destroy(gameObject,lifeTime);
+        Vector3 scale = transform.localScale;
+        scale.x = -Mathf.Sign(direction.x) * Mathf.Abs(scale.x);
+        transform.localScale = scale;
+        Destroy(gameObject,lifeTime);
     }
 
     private void Update()
