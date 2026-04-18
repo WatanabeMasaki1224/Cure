@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f540c5e20012bdf46b0d06d386cf113c, type: 3}
+  m_Name: EnemyPlayer
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  moveSpeed: 2
+  maxHP: 5
+  attackPower: 1
+  type: 0
+  prefab: {fileID: 6057158563173616063, guid: 5c089b8e902e60e41a1891c3c1f485c1, type: 3}
+  maxCount: 5
+  spawnRate: 4
+  score: 10

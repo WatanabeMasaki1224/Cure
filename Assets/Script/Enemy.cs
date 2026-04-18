@@ -16,6 +16,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckDistance = 0.2f; //前にどれくらいずらしてチェックするか
     [SerializeField] float groundCheckOffset = 0.5f;//どのくらい下を見るか
+    [SerializeField] float wallCheckDistance = 0.2f;
     [SerializeField] float patrolRange = 3f; // ウロウロ範囲
     float startX;
     float patrolDir = 1f;
@@ -77,28 +78,26 @@ public class Enemy : MonoBehaviour
     /// <param name="target"></param>
     void Move(Vector2 target)
     {
-        // X距離だけで判定
-        float distX = Mathf.Abs(target.x - transform.position.x);
+      　// 進行方向（Xのみ）
+        float dir = Mathf.Sign(target.x - transform.position.x);
+        Flip(dir);
 
-        // 範囲外なら停止
-        if (distX > chaseRange)
+        // 前方チェック（壁）
+        RaycastHit2D wallHit = Physics2D.Raycast(transform.position, new Vector2(dir, 0), wallCheckDistance, groundLayer);
+        if (wallHit.collider != null)
         {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            patrolDir *= -1f;
+            rb.linearVelocity = new Vector2(patrolDir * data.moveSpeed, rb.linearVelocity.y);
             return;
         }
 
-        // 進行方向（Xのみ）
-        float dir = Mathf.Sign(target.x - transform.position.x);
-
-        // 足場チェック（前方の足元）
+        // 足場チェック（
         Vector2 checkPos = (Vector2)transform.position + new Vector2(dir * groundCheckOffset, -0.5f);
-
         RaycastHit2D groundHit = Physics2D.Raycast(checkPos, Vector2.down, groundCheckDistance, groundLayer);
-
-        // 足場がない → 落ちるの防ぐ
+        // 足場がないときに落ちるの防ぐ
         if (groundHit.collider == null)
         {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(patrolDir * data.moveSpeed, rb.linearVelocity.y);
             return;
         }
 
@@ -117,6 +116,7 @@ public class Enemy : MonoBehaviour
             {
                 player.TakeDamage(data.attackPower);
             }
+            spawner.OnEnemyDead(data);
             Destroy(gameObject);
         }
 
@@ -129,6 +129,7 @@ public class Enemy : MonoBehaviour
             if (rp != null && rp.state == RepairPoint.RepairState.Repaired)
             {
                 rp.TakeDamage();
+                spawner.OnEnemyDead(data);
                 Die(other.gameObject);
             }
         }
@@ -166,6 +167,8 @@ public class Enemy : MonoBehaviour
 
     void Patrol()
     {
+        Flip(patrolDir);
+
         float left = startX - patrolRange;
         float right = startX + patrolRange;
 
@@ -231,5 +234,14 @@ public class Enemy : MonoBehaviour
         }
 
         return null;
+    }
+
+    void Flip(float dir)
+    {
+        if (dir == 0) return;
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * Mathf.Sign(dir);
+        transform.localScale = scale;
     }
 }

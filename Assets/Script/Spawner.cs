@@ -3,7 +3,21 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] Transform[] _spawnPoints;
+    public enum SpawnType
+    {
+        Both,
+        PlayerOnly,
+        RepairOnly
+    }
+
+    [System.Serializable]
+    public class SpawnPointData
+    {
+        public Transform point;
+        public SpawnType type;
+    }
+
+    [SerializeField] SpawnPointData[] _spawnPoints;
     [SerializeField] EnemyData[] _enemyDatas;
     [SerializeField] int _maxTotal = 10;
     [SerializeField] float _spawnInterval = 2f;
@@ -35,29 +49,43 @@ public class Spawner : MonoBehaviour
     {
         if (_currentTotal >= _maxTotal) return;
 
-        EnemyData data = GetRandomEnemy();
+        // スポーンポイント決める
+        var point = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
+        //  その場所で出せる敵を集める
+        List<EnemyData> candidates = new List<EnemyData>();
+        EnemyData data = GetRandomEnemy(point);
 
         if (data == null) return;
 
-        // スポーン位置ランダム
-        Transform point = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-
-        GameObject obj = Instantiate(data.prefab, point.position, Quaternion.identity);
-
+        //スポーン
+        GameObject obj = Instantiate(data.prefab, point.point.position, Quaternion.identity);
         _currentCounts[data]++;
         _currentTotal++;
-
-        // 死亡時に減らす
         obj.GetComponent<Enemy>().Init(this, data);
     }
 
-    EnemyData GetRandomEnemy()
+    bool CanSpawn(EnemyData data, SpawnPointData point)
+    {
+        if (point.type == SpawnType.Both) return true;
+
+        if (data.type == EnemyType.TargetPlayer && point.type == SpawnType.PlayerOnly)
+            return true;
+
+        if (data.type == EnemyType.TargetRepair && point.type == SpawnType.RepairOnly)
+            return true;
+
+        return false;
+    }
+
+    EnemyData GetRandomEnemy(SpawnPointData point)
     {
         List<EnemyData> candidates = new List<EnemyData>();
 
         foreach (var data in _enemyDatas)
         {
-            if (_currentCounts[data] < data.maxCount)
+            if (_currentCounts[data] >= data.maxCount) continue;
+
+            if (CanSpawn(data, point))
             {
                 candidates.Add(data);
             }
