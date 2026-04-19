@@ -17,6 +17,6 @@ MonoBehaviour:
   attackPower: 1
   type: 0
   prefab: {fileID: 6057158563173616063, guid: 5c089b8e902e60e41a1891c3c1f485c1, type: 3}
-  maxCount: 5
+  maxCount: 10
   spawnRate: 4
   score: 10

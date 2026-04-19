@@ -98,7 +98,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F) && isGround)
         {
             Attack();
             anim.SetTrigger("Attack");
@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Repair開始
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && isGround)
         {
             PlayerStartRepair();
         }
@@ -147,8 +147,15 @@ public class PlayerController : MonoBehaviour
     {
         state = PlayerState.Attack;
         attackTimer = attackDuration;
+        StartCoroutine(FireDelay());
+    }
+        
+
+    IEnumerator FireDelay()
+    {
+            yield return new WaitForSeconds(0.4f);
         Vector2 dir = lastDirection;
-        // 入力がない時は右向き（仮）
+        // 入力がない時は右向き
         if (dir == Vector2.zero)
             dir = Vector2.right;
         GameObject bullet = Instantiate(bulletPrefab, firePosition.position, Quaternion.identity);
