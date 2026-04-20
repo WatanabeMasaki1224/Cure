@@ -25,6 +25,12 @@ public class Spawner : MonoBehaviour
 
     Dictionary<EnemyData, int> _currentCounts = new Dictionary<EnemyData, int>();
     int _currentTotal = 0;
+    Transform player;
+
+    void Awake()
+    {
+        player = GameObject.FindWithTag("Player").transform;
+    }
 
     void Start()
     {
@@ -49,10 +55,22 @@ public class Spawner : MonoBehaviour
     {
         if (_currentTotal >= _maxTotal) return;
 
+        // プレイヤーが近くにいないポイントを探す
+        List<SpawnPointData> validPoints = new List<SpawnPointData>();
+
+        foreach (var p in _spawnPoints)
+        {
+            if (!IsNearPlayer(p.point.position))
+            {
+                validPoints.Add(p);
+            }
+        }
+
+        if (validPoints.Count == 0) return;
+
         // スポーンポイント決める
-        var point = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-        //  その場所で出せる敵を集める
-        List<EnemyData> candidates = new List<EnemyData>();
+        var point = validPoints[Random.Range(0, validPoints.Count)];
+        //  そる敵を集めるの場所で出せ
         EnemyData data = GetRandomEnemy(point);
 
         if (data == null) return;
@@ -117,6 +135,11 @@ public class Spawner : MonoBehaviour
     {
         _currentCounts[data]--;
         _currentTotal--;
+    }
+
+    bool IsNearPlayer(Vector2 pos)
+    {
+        return Vector2.Distance(player.position, pos) < 3.0f;
     }
 
 }

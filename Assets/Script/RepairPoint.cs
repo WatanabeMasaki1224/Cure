@@ -13,9 +13,9 @@ public class RepairPoint : MonoBehaviour
     [SerializeField] float repairTime = 3f;
     float timer = 0f;
     [SerializeField] SpriteRenderer sr;
-    [SerializeField] Color brokenColor = Color.red;
-    [SerializeField] Color repairingColor = Color.yellow;
-    [SerializeField] Color repairedColor = Color.green;
+    [SerializeField] Sprite brokenSprite;
+    [SerializeField] Sprite repairingSprite;
+    [SerializeField] Sprite repairedSprite;
     [SerializeField] int repairScore = 50;
     [SerializeField] int breakRepairPontScore = 30;
     [SerializeField] int sustainableScore = 2;
@@ -82,15 +82,15 @@ public class RepairPoint : MonoBehaviour
         switch (state)
         {
             case RepairState.Broken:
-                sr.color = brokenColor;
+                sr.sprite = brokenSprite;
                 break;
 
             case RepairState.Repairing:
-                sr.color = repairingColor;
+                sr.sprite = repairingSprite;
                 break;
 
             case RepairState.Repaired:
-                sr.color = repairedColor;
+                sr.sprite = repairedSprite;
                 break;
         }
     }
